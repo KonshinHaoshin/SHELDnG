@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --bg-paper: #fff9f4;
+  --bg-cream: #fff3e3;
+  --ink-strong: #4a372a;
+  --ink-soft: #735b48;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink-strong);
+  background:
+    radial-gradient(circle at top, rgba(255, 248, 231, 0.9), rgba(255, 248, 231, 0) 32%),
+    linear-gradient(180deg, #fffaf5 0%, #fff2e6 52%, #ffece2 100%);
+  font-family:
+    "Microsoft YaHei",
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Noto Sans CJK SC",
+    sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.home-hero-panel {
+  box-shadow:
+    0 24px 80px rgba(132, 84, 45, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.soft-float {
+  animation: softFloat 5.6s ease-in-out infinite;
+}
+
+.soft-float-delayed {
+  animation: softFloat 7.2s ease-in-out infinite;
+  animation-delay: -1.8s;
+}
+
+.fade-rise {
+  animation: fadeRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes softFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes fadeRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soft-float,
+  .soft-float-delayed,
+  .fade-rise {
+    animation: none;
+  }
+}
