@@ -7,6 +7,7 @@ import {
   GameState,
   DrawData,
   GameEvent,
+  PublicRoomSummary,
 } from "../types/index.js";
 import { DEFAULT_SETTINGS, MAX_PLAYERS, MIN_PLAYERS } from "./constants.js";
 import { setRoom, getRoom, deleteRoom } from "../utils/redis.js";
@@ -139,6 +140,24 @@ export function getRoomById(roomId: string): Room | null {
 export function updateRoom(room: Room): void {
   rooms.set(room.roomId, room);
   setRoom(room.roomId, room).catch(console.error);
+}
+
+export function getPublicRoomSummaries(): PublicRoomSummary[] {
+  return [...rooms.values()]
+    .filter((room) => !room.isPrivate && room.gameState.phase === "waiting")
+    .sort((a, b) => b.players.length - a.players.length)
+    .map((room) => ({
+      roomId: room.roomId,
+      creator: room.creator,
+      hostName: room.players.find((player) => player.id === room.creator)?.username ?? "房主",
+      playerCount: room.players.length,
+      maxPlayers: room.settings.maxPlayers,
+      roundCount: room.settings.rounds,
+      drawTime: room.settings.drawTime,
+      wordCount: room.settings.wordCount,
+      customWordCount: room.settings.customWords.length,
+      phase: room.gameState.phase,
+    }));
 }
 
 export function sanitizeRoom(room: Room) {

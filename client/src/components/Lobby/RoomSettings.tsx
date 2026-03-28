@@ -126,7 +126,7 @@ export function RoomSettings({ settings, isCreator }: RoomSettingsProps) {
           </label>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+        <div className="grid gap-3">
           <label className="rounded-2xl border border-[rgba(190,148,113,0.16)] bg-white/90 px-4 py-3">
             <span className="text-sm font-medium text-[#6b5140]">提示次数</span>
             <select
@@ -140,13 +140,6 @@ export function RoomSettings({ settings, isCreator }: RoomSettingsProps) {
               ))}
             </select>
           </label>
-
-          <div className="rounded-2xl border border-[rgba(190,148,113,0.16)] bg-white/90 px-4 py-3">
-            <p className="text-sm font-medium text-[#6b5140]">词库语言</p>
-            <div className="mt-2 rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-600">
-              仅中文
-            </div>
-          </div>
         </div>
 
         <div className="rounded-[28px] border border-[rgba(190,148,113,0.16)] bg-white/90 px-4 py-4">

@@ -15,6 +15,7 @@ import {
   GameEvent,
   ChatMessage,
   TurnResult,
+  PublicRoomSummary,
 } from "../types";
 import { getSocket } from "../lib/socket";
 import { useAuth } from "./AuthContext";
@@ -24,12 +25,14 @@ interface RoomContextValue {
   room: Room | null;
   myPlayerId: string | null;
   messages: ChatMessage[];
+  publicRooms: PublicRoomSummary[];
   wordChoices: string[] | null;
   myWord: string | null; // the word if I'm drawing
   connected: boolean;
   // Actions
   createRoom: (settings?: Partial<Settings>) => void;
   joinRoom: (roomId: string) => void;
+  refreshPublicRooms: () => void;
   leaveRoom: () => void;
   startGame: () => void;
   selectWord: (word: string) => void;
@@ -45,11 +48,13 @@ const RoomContext = createContext<RoomContextValue>({
   room: null,
   myPlayerId: null,
   messages: [],
+  publicRooms: [],
   wordChoices: null,
   myWord: null,
   connected: false,
   createRoom: () => {},
   joinRoom: () => {},
+  refreshPublicRooms: () => {},
   leaveRoom: () => {},
   startGame: () => {},
   selectWord: () => {},
@@ -66,6 +71,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
   const [room, setRoom] = useState<Room | null>(null);
   const [myPlayerId, setMyPlayerId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [publicRooms, setPublicRooms] = useState<PublicRoomSummary[]>([]);
   const [wordChoices, setWordChoices] = useState<string[] | null>(null);
   const [myWord, setMyWord] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
@@ -90,6 +96,10 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       setMessages([]);
       setWordChoices(null);
       setMyWord(null);
+    });
+
+    s.on(GameEvent.PUBLIC_ROOM_LIST, (rooms: PublicRoomSummary[]) => {
+      setPublicRooms(rooms);
     });
 
     s.on(GameEvent.PLAYER_JOINED, ({ player }: { player: Player }) => {
@@ -265,6 +275,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     });
 
     s.connect();
+    s.emit(GameEvent.LIST_PUBLIC_ROOMS);
 
     return () => {
       s.off("connect");
@@ -279,6 +290,10 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
 
   const joinRoom = useCallback((roomId: string) => {
     socketRef.current?.emit(GameEvent.JOIN_ROOM, { roomId });
+  }, []);
+
+  const refreshPublicRooms = useCallback(() => {
+    socketRef.current?.emit(GameEvent.LIST_PUBLIC_ROOMS);
   }, []);
 
   const leaveRoom = useCallback(() => {
@@ -330,11 +345,13 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         room,
         myPlayerId,
         messages,
+        publicRooms,
         wordChoices,
         myWord,
         connected,
         createRoom,
         joinRoom,
+        refreshPublicRooms,
         leaveRoom,
         startGame,
         selectWord,

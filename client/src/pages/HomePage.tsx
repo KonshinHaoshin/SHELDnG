@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRoom } from "../context/RoomContext";
 import { useAuth } from "../context/AuthContext";
 import { LoginButton } from "../components/Auth/LoginButton";
@@ -6,21 +6,16 @@ import faviconImage from "../assets/favicon01.png";
 import backgroundMain from "../assets/background01.webp";
 import backgroundSub from "../assets/background02.webp";
 
-export function HomePage() {
-  const { createRoom, joinRoom, connected } = useRoom();
-  const { user, signIn, error } = useAuth();
-  const [roomIdInput, setRoomIdInput] = useState("");
-  const [mode, setMode] = useState<"home" | "join">("home");
+interface HomePageProps {
+  onOpenLobby: () => void;
+}
+
+export function HomePage({ onOpenLobby }: HomePageProps) {
+  const { createRoom, connected } = useRoom();
+  const { error } = useAuth();
 
   const handleCreate = () => {
     createRoom();
-  };
-
-  const handleJoin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (roomIdInput.trim().length >= 4) {
-      joinRoom(roomIdInput.trim().toUpperCase());
-    }
   };
 
   return (
@@ -64,10 +59,10 @@ export function HomePage() {
               <div className="space-y-5">
                 <div className="space-y-4">
                   <h2 className="max-w-2xl text-5xl font-black leading-[1.08] text-[#52362d] md:text-7xl">
-                    SHEL Draw&Guess!
+                    庇护所你画我猜
                   </h2>
                   <p className="max-w-2xl text-lg leading-8 text-[#6d5545] md:text-xl">
-                    支持自定义词库，支持多种游戏模式，支持好友开黑，也支持随机匹配。
+                    创建房间，或直接进入公开大厅找人开局。
                   </p>
                 </div>
               </div>
@@ -92,69 +87,32 @@ export function HomePage() {
                 <div className="flex flex-col justify-between gap-6 p-6 md:p-8">
                   <div className="space-y-4">
                     <div className="inline-flex rounded-full bg-[rgba(239,146,173,0.12)] px-3 py-1 text-sm font-semibold text-[#b75f7f]">
-                      今晚就开一局
+                      公开房间
                     </div>
                     <div>
-                      <h3 className="text-3xl font-black text-[#53372d]">进入封面大厅</h3>
+                      <h3 className="text-3xl font-black text-[#53372d]">快速开始</h3>
 
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    {mode === "home" ? (
-                      <>
-                        <button
-                          onClick={handleCreate}
-                          disabled={!connected}
-                          className="w-full rounded-[22px] bg-[linear-gradient(135deg,#eb91ad,#e6b060)] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_36px_rgba(215,135,111,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-105 disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-[linear-gradient(135deg,#d6cfc8,#c8c0b7)] disabled:shadow-none"
-                        >
-                          创建房间
-                        </button>
+                    <button
+                      onClick={handleCreate}
+                      disabled={!connected}
+                      className="w-full rounded-[22px] bg-[linear-gradient(135deg,#eb91ad,#e6b060)] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_36px_rgba(215,135,111,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-105 disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-[linear-gradient(135deg,#d6cfc8,#c8c0b7)] disabled:shadow-none"
+                    >
+                      创建房间
+                    </button>
 
-                        <button
-                          onClick={() => setMode("join")}
-                          disabled={!connected}
-                          className="w-full rounded-[22px] border border-[rgba(181,129,88,0.2)] bg-[rgba(255,255,255,0.82)] px-6 py-4 text-lg font-bold text-[#654938] transition duration-300 hover:-translate-y-0.5 hover:bg-[rgba(255,251,248,0.95)] disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-[rgba(239,236,231,0.92)] disabled:text-[#a6978a]"
-                        >
-                          输入房间码
-                        </button>
-                        {error && (
-                          <p className="text-sm text-[#cc5f66]">{error}</p>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <form onSubmit={handleJoin} className="space-y-3">
-                          <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-[#7d5f4d]">
-                              房间码
-                            </label>
-                            <input
-                              type="text"
-                              value={roomIdInput}
-                              onChange={(e) => setRoomIdInput(e.target.value.toUpperCase())}
-                              placeholder="请输入房间码"
-                              maxLength={8}
-                              autoFocus
-                              className="w-full rounded-[20px] border border-[rgba(189,145,111,0.2)] bg-[rgba(255,255,255,0.92)] px-4 py-4 text-center text-2xl font-black tracking-[0.36em] text-[#5f4334] outline-none transition focus:border-[#de8ca3] focus:shadow-[0_0_0_4px_rgba(238,140,171,0.12)]"
-                            />
-                          </div>
-                          <button
-                            type="submit"
-                            disabled={!connected || roomIdInput.trim().length < 4}
-                            className="w-full rounded-[22px] bg-[linear-gradient(135deg,#eb91ad,#e6b060)] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_36px_rgba(215,135,111,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-105 disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-[linear-gradient(135deg,#d6cfc8,#c8c0b7)] disabled:shadow-none"
-                          >
-                            加入房间
-                          </button>
-                        </form>
-
-                        <button
-                          onClick={() => setMode("home")}
-                          className="w-full rounded-[18px] px-4 py-2 text-sm font-medium text-[#8a6b58] transition hover:bg-[rgba(255,255,255,0.58)]"
-                        >
-                          返回大厅
-                        </button>
-                      </>
+                    <button
+                      onClick={onOpenLobby}
+                      disabled={!connected}
+                      className="w-full rounded-[22px] border border-[rgba(181,129,88,0.2)] bg-[rgba(255,255,255,0.82)] px-6 py-4 text-lg font-bold text-[#654938] transition duration-300 hover:-translate-y-0.5 hover:bg-[rgba(255,251,248,0.95)] disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-[rgba(239,236,231,0.92)] disabled:text-[#a6978a]"
+                    >
+                      进入大厅
+                    </button>
+                    {error && (
+                      <p className="text-sm text-[#cc5f66]">{error}</p>
                     )}
                   </div>
                 </div>

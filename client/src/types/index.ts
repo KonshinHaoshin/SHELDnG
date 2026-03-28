@@ -24,6 +24,8 @@ export enum GameEvent {
   CHAT_MESSAGE = "chatMessage",
   CHANGE_SETTING = "changeSettings",
   SETTINGS_CHANGED = "settingsChanged",
+  LIST_PUBLIC_ROOMS = "listPublicRooms",
+  PUBLIC_ROOM_LIST = "publicRoomList",
   VOTE_KICK = "voteKick",
   KICKED = "kicked",
   GAME_STATE = "gameState",
@@ -94,6 +96,19 @@ export interface Room {
   gameState: GameState;
   settings: Settings;
   isPrivate: boolean;
+}
+
+export interface PublicRoomSummary {
+  roomId: string;
+  creator: string;
+  hostName: string;
+  playerCount: number;
+  maxPlayers: number;
+  roundCount: number;
+  drawTime: number;
+  wordCount: number;
+  customWordCount: number;
+  phase: GamePhase;
 }
 
 export interface ChatMessage {

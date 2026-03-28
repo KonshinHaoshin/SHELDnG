@@ -8,6 +8,7 @@ import {
   getRoomById,
   updateRoom,
   sanitizeRoom,
+  getPublicRoomSummaries,
 } from "../game/gameController.js";
 import {
   startGame,
@@ -21,6 +22,10 @@ export function registerSocketHandlers(io: Server, socket: Socket): void {
     username: string;
     avatar: string;
   } | null;
+
+  function emitPublicRoomList(target: Socket | Server = io) {
+    target.emit(GameEvent.PUBLIC_ROOM_LIST, getPublicRoomSummaries());
+  }
 
   function makePlayer(): Player {
     return {
@@ -43,6 +48,7 @@ export function registerSocketHandlers(io: Server, socket: Socket): void {
       const room = await createRoom(io, socket, player, data.settings);
       socket.emit(GameEvent.JOINED_ROOM, { room: sanitizeRoom(room), playerId: player.id });
       io.to(room.roomId).emit(GameEvent.PLAYER_JOINED, { player });
+      emitPublicRoomList();
     } else {
       const result = await joinRoom(io, socket, player, data.roomId.toUpperCase());
       if (!result.success || !result.room) {
@@ -55,15 +61,18 @@ export function registerSocketHandlers(io: Server, socket: Socket): void {
       if (result.room.gameState.drawingData.length > 0) {
         socket.emit(GameEvent.DRAW_DATA, { batch: result.room.gameState.drawingData });
       }
+      emitPublicRoomList();
     }
   });
 
   socket.on(GameEvent.LEAVE_ROOM, async () => {
     await leaveRoom(io, socket);
+    emitPublicRoomList();
   });
 
   socket.on("disconnect", async () => {
     await leaveRoom(io, socket);
+    emitPublicRoomList();
   });
 
   // --- Game events ---
@@ -79,6 +88,7 @@ export function registerSocketHandlers(io: Server, socket: Socket): void {
       return;
     }
     startGame(io, room);
+    emitPublicRoomList();
   });
 
   socket.on(GameEvent.WORD_SELECT, (data: { word: string }) => {
@@ -179,6 +189,11 @@ export function registerSocketHandlers(io: Server, socket: Socket): void {
     Object.assign(room.settings, data);
     updateRoom(room);
     io.to(room.roomId).emit(GameEvent.SETTINGS_CHANGED, room.settings);
+    emitPublicRoomList();
+  });
+
+  socket.on(GameEvent.LIST_PUBLIC_ROOMS, () => {
+    emitPublicRoomList(socket);
   });
 
   // --- Game state sync ---
