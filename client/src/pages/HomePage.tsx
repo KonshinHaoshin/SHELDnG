@@ -86,9 +86,7 @@ export function HomePage() {
                     className="h-full w-full object-cover"
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,248,239,0.02),rgba(96,59,34,0.32))]" />
-                  <div className="absolute left-5 top-5 rounded-full border border-[rgba(255,255,255,0.65)] bg-[rgba(255,252,248,0.78)] px-3 py-1 text-xs font-semibold tracking-[0.16em] text-[#8a6b58] backdrop-blur-md">
-                    封面插画
-                  </div>
+
                 </div>
 
                 <div className="flex flex-col justify-between gap-6 p-6 md:p-8">
